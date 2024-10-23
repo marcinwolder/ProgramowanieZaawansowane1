@@ -1,0 +1,60 @@
+{
+  "title": "Pies Programista",
+  "photo": {
+    "url": "https://encrypted-tbn0.gstatic.com/images?q\u003dtbn:ANd9GcSCnKU5ZXpkJymCHXiEI7ZvIvbbbRF_tm7lo6KK-Lo9Js2PD3bB"
+  },
+  "sections": [
+    {
+      "title": "Wykształcenie:",
+      "paragraphs": [
+        {
+          "type": "Paragraph",
+          "content": "2000-2005 Przedszkole im. Królewny Snieżki w ..."
+        },
+        {
+          "type": "Paragraph",
+          "content": "2006-2012 SP7 im Ronalda Regana w ..."
+        },
+        {
+          "type": "ParagraphWithList",
+          "list": {
+            "items": [
+              {
+                "content": "Języka Angielskiego"
+              },
+              {
+                "content": "Języka Hiszpańskiego"
+              },
+              {
+                "content": "Szydełkowania"
+              }
+            ]
+          },
+          "content": "Kursy"
+        }
+      ]
+    },
+    {
+      "title": "Umiejętności",
+      "paragraphs": [
+        {
+          "type": "ParagraphWithList",
+          "list": {
+            "items": [
+              {
+                "content": "C"
+              },
+              {
+                "content": "C++"
+              },
+              {
+                "content": "Java"
+              }
+            ]
+          },
+          "content": "Znane technologie"
+        }
+      ]
+    }
+  ]
+}
