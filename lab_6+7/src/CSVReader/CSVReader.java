@@ -1,3 +1,5 @@
+package CSVReader;
+
 import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -29,14 +31,14 @@ public class CSVReader {
     public CSVReader(String filename) throws FileNotFoundException {
         this(filename, ",");
     }
-    CSVReader(Reader reader, String delimiter, boolean hasHeader) {
+    public CSVReader(Reader reader, String delimiter, boolean hasHeader) {
         this.reader = new BufferedReader(reader);
         this.delimiter = delimiter;
         this.hasHeader = hasHeader;
         if(hasHeader) parseHeader();
     }
 
-    void parseHeader() {
+    public void parseHeader() {
         String line  = null;
         try {
             line = reader.readLine();
@@ -51,7 +53,7 @@ public class CSVReader {
         }
     }
 
-    boolean next(){
+    public boolean next(){
         String line  = null;
         try {
             line = reader.readLine();
@@ -63,10 +65,10 @@ public class CSVReader {
         }
     }
 
-    List<String> getColumnLabels() {
+    public List<String> getColumnLabels() {
         return columnLabels;
     }
-    int getRecordLength() {
+    public int getRecordLength() {
         return current.length;
     }
     boolean isMissing(int columnIndex) {
@@ -76,15 +78,15 @@ public class CSVReader {
         if (!columnLabels.contains(columnLabel)) return true;
         return isMissing(columnLabelsToInt.get(columnLabel));
     }
-    String get(int columnIndex) {
+    public String get(int columnIndex) {
         if (isMissing(columnIndex)) return null;
         return current[columnIndex];
     }
-    String get(String columnLabel) {
+    public String get(String columnLabel) {
         if (isMissing(columnLabel)) return null;
         return get(columnLabelsToInt.get(columnLabel));
     }
-    Integer getInt(int columnIndex) {
+    public Integer getInt(int columnIndex) {
         if (isMissing(columnIndex)) return null;
         try {
             return Integer.parseInt(this.get(columnIndex));
@@ -92,11 +94,11 @@ public class CSVReader {
             return null;
         }
     }
-    Integer getInt (String columnLabel) {
+    public Integer getInt (String columnLabel) {
         if (isMissing(columnLabel)) return null;
         return getInt(columnLabelsToInt.get(columnLabel));
     }
-    Long getLong(int columnIndex) {
+    public Long getLong(int columnIndex) {
         if (isMissing(columnIndex)) return null;
         try {
             return Long.parseLong(this.get(columnIndex));
@@ -104,11 +106,11 @@ public class CSVReader {
             return null;
         }
     }
-    Long getLong(String columnLabel) {
+    public Long getLong(String columnLabel) {
         if (isMissing(columnLabel)) return null;
         return getLong(columnLabelsToInt.get(columnLabel));
     }
-    Double getDouble(int columnIndex) {
+    public Double getDouble(int columnIndex) {
         if (isMissing(columnIndex)) return null;
         try {
             return Double.parseDouble(this.get(columnIndex));
@@ -116,23 +118,23 @@ public class CSVReader {
             return null;
         }
     }
-    Double getDouble(String columnLabel) {
+    public Double getDouble(String columnLabel) {
         if (isMissing(columnLabel)) return null;
         return getDouble(columnLabelsToInt.get(columnLabel));
     }
-    LocalDate getDate(int columnIndex, String format) {
+    public LocalDate getDate(int columnIndex, String format) {
         if (isMissing(columnIndex)) return null;
         return LocalDate.parse(get(columnIndex), DateTimeFormatter.ofPattern(format));
     }
-    LocalDate getDate(String columnLabel, String format) {
+    public LocalDate getDate(String columnLabel, String format) {
         if (isMissing(columnLabel)) return null;
         return getDate(columnLabelsToInt.get(columnLabel), format);
     }
-    LocalTime getTime(int columnIndex, String format) {
+    public LocalTime getTime(int columnIndex, String format) {
         if (isMissing(columnIndex)) return null;
         return LocalTime.parse(get(columnIndex), DateTimeFormatter.ofPattern(format));
     }
-    LocalTime getTime(String columnLabel, String format) {
+    public LocalTime getTime(String columnLabel, String format) {
         if (isMissing(columnLabel)) return null;
         return getTime(columnLabelsToInt.get(columnLabel), format);
     }
