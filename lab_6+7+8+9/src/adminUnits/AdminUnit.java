@@ -13,7 +13,7 @@ public class AdminUnit {
     protected Long parentId;
     AdminUnit parent;
     List<AdminUnit> children = new ArrayList<AdminUnit>();
-    BoundingBox bbox;
+    BoundingBox bbox = new BoundingBox();
 
     AdminUnit(String name, Integer adminLevel, Double population, Double area, Double density) {
         this.name = name;
@@ -28,7 +28,7 @@ public class AdminUnit {
         for (int i = 0; i < children.size(); i++) {
             children_names[i] = children.get(i).name;
         }
-        return "(name=" + name + ", admin_level=" + adminLevel + ", area=" + area + ", population=" + population + ", density=" + density + ", parent_name=" + (parent == null ? null : parent.name) + ", children_names=" + Arrays.toString(children_names) + ")";
+        return "(name=" + name + ", admin_level=" + adminLevel + ", area=" + area + ", population=" + population + ", density=" + density + ", parent_name=" + (parent == null ? null : parent.name) + ", children_names=" + Arrays.toString(children_names) + ", bbox=" + bbox.toString() + ")";
     }
 
     void fixMissingValues() {

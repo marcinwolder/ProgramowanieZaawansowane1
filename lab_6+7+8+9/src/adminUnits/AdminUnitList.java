@@ -4,13 +4,10 @@ import CSVReader.CSVReader;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AdminUnitList {
-    List<AdminUnit> units = new ArrayList<>();
+    public List<AdminUnit> units = new ArrayList<>();
     Map<Long, AdminUnit> idToAdminUnitMap = new HashMap<Long, AdminUnit>();
 
     /**
@@ -33,13 +30,19 @@ public class AdminUnitList {
                 Double x2 = reader.getDouble("x2");
                 Double x3 = reader.getDouble("x3");
                 Double x4 = reader.getDouble("x4");
+                Double x5 = reader.getDouble("x5");
                 Double y1 = reader.getDouble("y1");
                 Double y2 = reader.getDouble("y2");
                 Double y3 = reader.getDouble("y3");
                 Double y4 = reader.getDouble("y4");
+                Double y5 = reader.getDouble("y5");
 
                 if (x1 != null) {
-                    au.bbox = new BoundingBox(x1, y1, x2, y2, x3, y3, x4, y4);
+                    au.bbox.addPoint(x1, y1);
+                    au.bbox.addPoint(x2, y2);
+                    au.bbox.addPoint(x3, y3);
+                    au.bbox.addPoint(x4, y4);
+                    au.bbox.addPoint(x5, y5);
                 }
 
                 au.parentId = reader.getLong("parent");
@@ -67,9 +70,7 @@ public class AdminUnitList {
      */
     public void list(PrintStream out){
         for (AdminUnit u : units) {
-//            if (u.population == null) {
-                out.println(u);
-//            }
+            out.println(u);
         }
     }
 
@@ -85,6 +86,19 @@ public class AdminUnitList {
         }
     }
 
+    public String getWKT() {
+        if (units.isEmpty()) return "";
+        StringBuilder sb = new StringBuilder();
+        sb.append("MULTILINESTRING(");
+        for (AdminUnit u : this.units) {
+            sb.append(u.bbox.toString());
+            sb.append(", ");
+        }
+        sb.delete(sb.length()-2, sb.length());
+        sb.append(")");
+        return sb.toString();
+    }
+
     /**
      * Zwraca now¹ listê zawieraj¹c¹ te obiekty adminUnits.AdminUnit, których nazwa pasuje do wzorca
      * @param pattern - wzorzec dla nazwy
@@ -95,17 +109,50 @@ public class AdminUnitList {
         AdminUnitList ret = new AdminUnitList();
         for (AdminUnit u : units) {
             if (regex) {
-//                matches()
                 if (u.name.matches(pattern)) {
                    ret.units.add(u);
                 };
             } else {
-//                contains()
                 if (u.name.contains(pattern)) {
                    ret.units.add(u);
-                };
+                }
             }
         }
+        return ret;
+    }
+
+    /**
+     * Zwraca listê jednostek s¹siaduj¹cych z jendostk¹ unit na tym samym poziomie hierarchii admin_level.
+     * Czyli s¹siadami wojweództw s¹ województwa, powiatów - powiaty, gmin - gminy, miejscowoœci - inne miejscowoœci
+     * @param unit - jednostka, której s¹siedzi maj¹ byæ wyznaczeni
+     * @param maxdistance - parametr stosowany wy³¹cznie dla miejscowoœci, maksymalny promieñ odleg³oœci od œrodka unit,
+     *                    w którym maj¹ sie znaleŸæ punkty œrodkowe BoundingBox s¹siadów
+     * @return lista wype³niona s¹siadami
+     */
+    public AdminUnitList getNeighbors(AdminUnit unit, Double maxdistance){
+        AdminUnitList ret = new AdminUnitList();
+
+        for (AdminUnit u : units) {
+            if (Objects.equals(unit.adminLevel, u.adminLevel) && unit.bbox.distanceTo(u.bbox) <= maxdistance) {
+                if (!unit.bbox.equals(u.bbox) && unit.bbox.intersects(u.bbox)) {
+                    ret.units.add(u);
+                }
+            }
+        }
+
+        return ret;
+    }
+    public AdminUnitList getNeighbors(AdminUnit unit) {return getNeighbors(unit, 15.0);};
+
+    public AdminUnitList getAllFromAdminLevel(AdminUnit unit){
+        AdminUnitList ret = new AdminUnitList();
+
+        for (AdminUnit u : units) {
+            if (Objects.equals(unit.adminLevel, u.adminLevel)) {
+                ret.units.add(u);
+            }
+        }
+
         return ret;
     }
 }

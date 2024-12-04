@@ -1,7 +1,12 @@
 import adminUnits.AdminUnitList;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Locale;
+
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 //        System.out.println("# TEST 1 - odczyt ró¿nych plików");
 //        CSVReader.CSVReader reader;
 //        for (String path : new String[]{"./csv/accelerator.csv", "./csv/with-header.csv"}) {
@@ -51,19 +56,38 @@ public class Main {
 //            throw new RuntimeException(e);
 //        }
 //        LAB 7
+//        AdminUnitList aul = new AdminUnitList();
+//        aul.read("./csv/admin-units.csv");
+//        System.out.println("# TEST 1a - odczyt pliku admin-units.csv");
+//        aul.list(System.out);
+//        System.out.println("\n# TEST 1b - odczyt pliku admin-units.csv");
+//        aul.list(System.out, 4 , 10);
+//
+//        System.out.println("\n# TEST 2 - select nazwa ze s³owem 'Bia³a'");
+//        AdminUnitList biala = aul.selectByName("Bia³a", false);
+//        biala.list(System.out);
+//
+//        System.out.println("\n# TEST 3 - select nazwa zaczynaj¹cych siê s³owem 'Bia³a'");
+//        AdminUnitList biala2 = aul.selectByName("^Bia³a.*", true);
+//        biala2.list(System.out);
+//        LAB 8
         AdminUnitList aul = new AdminUnitList();
         aul.read("./csv/admin-units.csv");
-        System.out.println("# TEST 1a - odczyt pliku admin-units.csv");
-        aul.list(System.out);
-        System.out.println("\n# TEST 1b - odczyt pliku admin-units.csv");
-        aul.list(System.out, 4 , 10);
-
-        System.out.println("\n# TEST 2 - select nazwa ze s³owem 'Bia³a'");
-        AdminUnitList biala = aul.selectByName("Bia³a", false);
-        biala.list(System.out);
-
-        System.out.println("\n# TEST 3 - select nazwa zaczynaj¹cych siê s³owem 'Bia³a'");
-        AdminUnitList biala2 = aul.selectByName("^Bia³a.*", true);
-        biala2.list(System.out);
+        AdminUnitList miasto = aul.selectByName("Prudnik", true);
+        AdminUnitList wszyscy = aul.getAllFromAdminLevel(miasto.units.getFirst());
+        // wywo³anie funkcji
+        double t1 = System.nanoTime()/1e6;
+        AdminUnitList sasiedzi = aul.getNeighbors(miasto.units.getFirst(), 400.0);
+        double t2 = System.nanoTime()/1e6;
+        System.out.printf(Locale.US,"t2-t1=%f\n",t2-t1);
+        BufferedWriter writer = new BufferedWriter(new FileWriter("wszyscy.txt"));
+        writer.write(wszyscy.getWKT());
+        writer.close();
+        System.out.print("Miasto: ");
+        System.out.println(miasto.getWKT());
+        System.out.print("S¹siedzi: ");
+        System.out.println(sasiedzi.getWKT());
+//        AdminUnitList wieliczka = aul.selectByName("Wieliczka", false);
+//        wieliczka.list(System.out);
     }
 }
