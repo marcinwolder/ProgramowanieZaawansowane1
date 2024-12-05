@@ -4,7 +4,10 @@ import CSVReader.CSVReader;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.text.Collator;
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class AdminUnitList {
     public List<AdminUnit> units = new ArrayList<>();
@@ -23,6 +26,10 @@ public class AdminUnitList {
                 Double population = reader.getDouble("population");
                 Double area = reader.getDouble("area");
                 Double density = reader.getDouble("density");
+
+                if (area == null) {
+                    continue;
+                }
 
                 AdminUnit au = new AdminUnit(name, adminLevel, population, area, density);
 
@@ -142,7 +149,7 @@ public class AdminUnitList {
 
         return ret;
     }
-    public AdminUnitList getNeighbors(AdminUnit unit) {return getNeighbors(unit, 15.0);};
+    public AdminUnitList getNeighbors(AdminUnit unit) { return getNeighbors(unit, Double.MAX_VALUE); };
 
     public AdminUnitList getAllFromAdminLevel(AdminUnit unit){
         AdminUnitList ret = new AdminUnitList();
@@ -153,6 +160,100 @@ public class AdminUnitList {
             }
         }
 
+        return ret;
+    }
+
+    private class NameComparator implements Comparator<AdminUnit> {
+        private final Collator collator;
+
+        public NameComparator() {
+            this.collator = Collator.getInstance(Locale.of("pl", "PL"));
+        }
+
+        public int compare(AdminUnit u1, AdminUnit u2) {
+            return collator.compare(u1.name, u2.name);
+        }
+    }
+
+    /**
+     * Sortuje dan¹ listê jednostek (in place = w miejscu)
+     * @return this
+     */
+    public AdminUnitList sortInplaceByName(){
+        this.units.sort(new NameComparator());
+        return this;
+    }
+
+    /**
+     * Sortuje dan¹ listê jednostek (in place = w miejscu)
+     * @return this
+     */
+    public AdminUnitList sortInplaceByArea(){
+        this.units.sort(new Comparator<AdminUnit>() {
+            @Override
+            public int compare(AdminUnit o1, AdminUnit o2) {
+                return Double.compare(o1.area, o2.area);
+            }
+        });
+        return this;
+    }
+
+    /**
+     * Sortuje dan¹ listê jednostek (in place = w miejscu)
+     * @return this
+     */
+    public AdminUnitList sortInplaceByPopulation(){
+        this.units.sort(((o1, o2) -> Double.compare(o1.population, o2.population)));
+        return this;
+    }
+
+    public AdminUnitList sortInplace(Comparator<AdminUnit> cmp){
+        this.units.sort(cmp);
+        return this;
+    }
+
+    public AdminUnitList sort(Comparator<AdminUnit> cmp){
+        AdminUnitList ret = new AdminUnitList();
+        ret.units.addAll(this.units);
+        ret.sortInplace(cmp);
+        return ret;
+    }
+
+    /**
+     *
+     * @param pred referencja do interfejsu Predicate
+     * @return now¹ listê, na której pozostawiono tylko te jednostki,
+     * dla których metoda test() zwraca true
+     */
+    public AdminUnitList filter(Predicate<AdminUnit> pred){
+        AdminUnitList ret = new AdminUnitList();
+        ret.units = this.units.stream().filter(pred).collect(Collectors.toList());
+        return ret;
+    }
+
+    /**
+     * Zwraca co najwy¿ej limit elementów spe³niaj¹cych pred
+     * @param pred - predykat
+     * @param limit - maksymalna liczba elementów
+     * @return now¹ listê
+     */
+    public AdminUnitList filter(Predicate<AdminUnit> pred, int limit){
+        AdminUnitList ret = new AdminUnitList();
+        ret.units = this.units.stream().filter(pred).limit(limit).collect(Collectors.toList());
+        return ret;
+    }
+
+    /**
+     * Zwraca co najwy¿ej limit elementów spe³niaj¹cych pred pocz¹wszy od offset
+     * Offest jest obliczany po przefiltrowaniu
+     * @param pred - predykat
+     * @param offset - od którego elementu
+     * @param limit - maksymalna liczba elementów
+     * @return now¹ listê
+     */
+    public AdminUnitList filter(Predicate<AdminUnit> pred, int offset, int limit){
+        AdminUnitList ret = new AdminUnitList();
+        ret.units = this.units.stream().filter(pred).skip(offset).limit(limit).collect(Collectors.toList());
         return ret;
     }
 }

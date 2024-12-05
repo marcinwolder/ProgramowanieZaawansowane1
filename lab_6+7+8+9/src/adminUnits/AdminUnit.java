@@ -5,17 +5,17 @@ import java.util.Arrays;
 import java.util.List;
 
 public class AdminUnit {
-    String name;
-    Integer adminLevel;
-    Double population;
-    Double area;
-    Double density;
+    public String name;
+    public Integer adminLevel;
+    public Double population;
+    public Double area;
+    public Double density;
     protected Long parentId;
-    AdminUnit parent;
-    List<AdminUnit> children = new ArrayList<AdminUnit>();
-    BoundingBox bbox = new BoundingBox();
+    public AdminUnit parent;
+    public List<AdminUnit> children = new ArrayList<AdminUnit>();
+    public BoundingBox bbox = new BoundingBox();
 
-    AdminUnit(String name, Integer adminLevel, Double population, Double area, Double density) {
+    public AdminUnit(String name, Integer adminLevel, Double population, Double area, Double density) {
         this.name = name;
         this.adminLevel = adminLevel;
         this.population = population;
