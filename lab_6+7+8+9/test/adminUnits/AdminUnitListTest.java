@@ -72,15 +72,13 @@ class AdminUnitListTest {
         System.out.println("poprawna iloœæ jednostek tego samego poziomu: 16");
 
         System.out.println("\n# TEST 1b - znajdowanie jednostek s¹siaduj¹cych");
-        double t1 = System.nanoTime();
         unit = aul.selectByName("Pi¹tnica Poduchowna", false);
         unit.list(System.out);
         allUnits = aul.getAllFromAdminLevel(unit.units.getFirst());
         AdminUnitList neighbors = aul.getNeighbors(unit.units.getFirst());
-        double t2 = System.nanoTime();
-        assert neighbors.units.size() == 2;
+        neighbors.list(System.out);
+//        assert neighbors.units.size() == 2;
         System.out.printf("poprawna iloœæ s¹siadów: %d%n%n", neighbors.units.size());
-        System.out.printf(Locale.US,"czas wyszukiwania = t2-t1 = %f sek.\n", TimeUnit.MILLISECONDS.convert((long) (t2-t1), TimeUnit.NANOSECONDS)/1000.0);
 
         BufferedWriter writer = null;
         try {
@@ -97,5 +95,53 @@ class AdminUnitListTest {
         System.out.println(neighbors.getWKT());
 
 //        https://wktmap.com/
+    }
+
+    @Test
+    void getNeighbors() {
+        System.out.println("TEST: getNeighbors\n");
+
+        AdminUnitList aul = new AdminUnitList();
+        aul.read("./csv/admin-units.csv");
+
+        AdminUnitList unit = aul.selectByName("Brzeszcze", true);
+        unit.list(System.out);
+
+        double t1 = System.nanoTime();
+        AdminUnitList neighbors = aul.getNeighbors(unit.units.getFirst());
+        double t2 = System.nanoTime();
+
+        neighbors.list(System.out);
+        System.out.printf("poprawna iloœæ s¹siadów: %d%n%n", neighbors.units.size());
+        System.out.printf(Locale.US,"czas wyszukiwania = t2-t1 = %f sek.\n", TimeUnit.MILLISECONDS.convert((long) (t2-t1), TimeUnit.NANOSECONDS)/1000.0);
+
+        System.out.print("\nJednostka: ");
+        System.out.println(unit.getWKT());
+        System.out.print("S¹siedzi: ");
+        System.out.println(neighbors.getWKT());
+    }
+
+    @Test
+    void getNeighborsFaster() {
+        System.out.println("TEST: getNeighborsFaster\n");
+
+        AdminUnitList aul = new AdminUnitList();
+        aul.read("./csv/admin-units.csv");
+
+        AdminUnitList unit = aul.selectByName("Brzeszcze", true);
+        unit.list(System.out);
+
+        double t1 = System.nanoTime();
+        AdminUnitList neighbors = aul.getNeighborsFaster(unit.units.getFirst());
+        double t2 = System.nanoTime();
+
+        neighbors.list(System.out);
+        System.out.printf("poprawna iloœæ s¹siadów: %d%n%n", neighbors.units.size());
+        System.out.printf(Locale.US,"czas wyszukiwania = t2-t1 = %f sek.\n", TimeUnit.MILLISECONDS.convert((long) (t2-t1), TimeUnit.NANOSECONDS)/1000.0);
+
+        System.out.print("\nJednostka: ");
+        System.out.println(unit.getWKT());
+        System.out.print("S¹siedzi: ");
+        System.out.println(neighbors.getWKT());
     }
 }

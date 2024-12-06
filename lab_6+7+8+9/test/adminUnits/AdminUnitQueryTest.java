@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -111,5 +112,20 @@ class AdminUnitQueryTest {
                 .and(a->a.parent.name.equals("województwo ma³opolskie"))
                 .sort((o1,o2)->-Double.compare(o1.population,o2.population));
         query.execute().list(System.out);
+    }
+    @Test
+    void customTest5() {
+        query.selectFrom(list)
+                .where(a->a.adminLevel != null && a.adminLevel == 8);
+        query.execute().list(System.out);
+    }
+    @Test
+    void customTest6() {
+        AdminUnitList filtered = list.filter(a-> a.name.equals("Brzeszcze"));
+        AdminUnit unit = filtered.units.getFirst();
+        AdminUnitList n = list.getNeighbors(unit);
+        System.out.println(filtered.getWKT());
+        n.list(System.out);
+        System.out.println(n.getWKT());
     }
 }

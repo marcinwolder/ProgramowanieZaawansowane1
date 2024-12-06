@@ -140,16 +140,51 @@ public class AdminUnitList {
         AdminUnitList ret = new AdminUnitList();
 
         for (AdminUnit u : units) {
-            if (Objects.equals(unit.adminLevel, u.adminLevel) && unit.bbox.distanceTo(u.bbox) <= maxdistance) {
-                if (!unit.bbox.equals(u.bbox) && unit.bbox.intersects(u.bbox)) {
-                    ret.units.add(u);
+            if (Objects.equals(unit.adminLevel, u.adminLevel)) {
+                if (!unit.bbox.equals(u.bbox)) {
+                    if ((unit.adminLevel < 8 && unit.bbox.intersects(u.bbox)) || unit.bbox.distanceTo(u.bbox) <= maxdistance){
+                        ret.units.add(u);
+                    }
                 }
             }
         }
 
         return ret;
     }
-    public AdminUnitList getNeighbors(AdminUnit unit) { return getNeighbors(unit, Double.MAX_VALUE); };
+    public AdminUnitList getNeighbors(AdminUnit unit) { return getNeighbors(unit, 15.0); };
+    public AdminUnitList getNeighborsFaster(AdminUnit unit, Double maxdistance){
+        final double KM_PER_DEG_LAT = 111.0;
+        AdminUnitList toScanList = filter(o->o.adminLevel != null && o.adminLevel == 4);
+        if (unit.adminLevel >= 8) {
+            double deltaLat = maxdistance / KM_PER_DEG_LAT;
+            double deltaLon = maxdistance / (KM_PER_DEG_LAT * Math.cos(Math.toRadians(unit.bbox.getCenterY())));
+
+            unit.bbox.ymin -= deltaLat;
+            unit.bbox.ymax += deltaLat;
+            unit.bbox.xmin -= deltaLon;
+            unit.bbox.xmax += deltaLon;
+        }
+
+        for (int level = 4; level <= unit.adminLevel;) {
+            toScanList = toScanList.filter(o-> {
+                if (o.bbox.equals(unit.bbox)) return false;
+                if (o.adminLevel >= 8) {
+                    return o.bbox.distanceTo(unit.bbox) <= maxdistance;
+                }
+                return o.bbox.intersects(unit.bbox);
+            });
+            if (level == unit.adminLevel) { break; }
+            AdminUnitList newList = new AdminUnitList();
+            for (AdminUnit u : toScanList.units) {
+                newList.units.addAll(u.children);
+            }
+            toScanList = newList;
+            level = toScanList.units.getFirst().adminLevel;
+        }
+
+        return toScanList;
+    }
+    public AdminUnitList getNeighborsFaster(AdminUnit unit) { return getNeighborsFaster(unit, 15.0); };
 
     public AdminUnitList getAllFromAdminLevel(AdminUnit unit){
         AdminUnitList ret = new AdminUnitList();
